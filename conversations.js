@@ -3,7 +3,7 @@
    of places, never altered in meaning — this is what the system actually
    produced, not scripted copy. */
 
-const EDGARIQ_CONVERSATIONS = [
+window.EDGARIQ_CONVERSATIONS = [
   {
     question: "How did NVIDIA's data center revenue grow year over year?",
     answer: "NVIDIA reported Data Center revenue of $75.2 billion in the quarter covered by the 10-Q filed 2026-05-20 — a 92% increase year-over-year, and a 21% sequential increase.",
