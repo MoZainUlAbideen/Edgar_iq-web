@@ -1,5 +1,5 @@
 # EdgarIQ — web
-
+### Link : https://edgar-iq-web.vercel.app/
 The two-page marketing/explainer site for EdgarIQ, plus a chat widget that
 plays back real, verified answers from an actual evaluation run — no
 backend required for this version.
