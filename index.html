@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EdgarIQ — Grounded research over SEC filings</title>
+<meta name="description" content="EdgarIQ answers questions about SEC filings with every figure traced back to its source — built on real retrieval, multi-agent verification, and a tested eval harness.">
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="home.css">
+<link rel="stylesheet" href="chat-widget.css">
+</head>
+<body>
+
+<header class="site-nav">
+  <div class="wrap">
+    <a href="index.html" class="logo">
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+        <circle cx="13" cy="13" r="10.5" stroke="url(#g1)" stroke-width="1.6"/>
+        <circle cx="18" cy="8" r="2.4" fill="#C084FC"/>
+        <defs>
+          <linearGradient id="g1" x1="2" y1="2" x2="24" y2="24">
+            <stop stop-color="#7C3AED"/>
+            <stop offset="1" stop-color="#3B1E6E"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      EdgarIQ
+    </a>
+    <nav class="nav-links">
+      <a href="how-it-works.html">How it works</a>
+      <a href="#proof">Eval results</a>
+      <a class="repo-link" href="https://github.com/" target="_blank" rel="noopener">View on GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <h1>Financial filings hide the truth in plain sight.</h1>
+        <p class="lede">EdgarIQ reads SEC filings the way an analyst should — and shows exactly which filing, and which sentence, every number came from.</p>
+        <div class="hero-actions">
+          <a href="how-it-works.html" class="btn btn-primary">See how it works</a>
+          <a href="#proof" class="btn btn-ghost">View the eval results</a>
+        </div>
+      </div>
+
+      <div class="doc-card">
+        <span class="doc-tag"><span class="dot"></span>10-Q · filed 2026-05-20</span>
+        <blockquote>&ldquo;Data Center revenue was $75.2 billion, up 92% from a year ago.&rdquo;</blockquote>
+        <div class="doc-verified">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8.5L6.5 12L13 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Cited to the source filing — not recalled from memory
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="problem">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Reading filings at scale breaks in three specific ways</h2>
+        <p>Each of these is a real failure mode this project hit, diagnosed, and fixed — not a hypothetical.</p>
+      </div>
+      <div class="problem-list">
+        <div class="problem-item">
+          <h3>Numbers get lost in translation</h3>
+          <p>Filing tables split a dollar sign into its own cell, separate from the value. A naive parser silently truncates the actual figure and keeps the symbol.</p>
+        </div>
+        <div class="problem-item">
+          <h3>Confidence isn&rsquo;t the same as correctness</h3>
+          <p>A language model will answer smoothly whether or not the source actually says what it claims. Fluency gives no signal about whether a number is real.</p>
+        </div>
+        <div class="problem-item">
+          <h3>The right quarter is buried in ten similar ones</h3>
+          <p>Every filing repeats the same disclosure, worded almost identically, with different numbers each time. Search has to know the difference — semantics alone can&rsquo;t.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="pipeline">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>What EdgarIQ actually does</h2>
+        <p>Six stages, each one accountable for a specific part of getting the answer right.</p>
+      </div>
+      <div class="pipeline">
+        <div class="pipeline-step">
+          <span class="step-num">01</span>
+          <h3>Ingest</h3>
+          <p>Pull 10-K and 10-Q filings directly from SEC EDGAR&rsquo;s public API.</p>
+        </div>
+        <div class="pipeline-step">
+          <span class="step-num">02</span>
+          <h3>Parse</h3>
+          <p>Strip layout noise; keep only tables that actually carry financial data.</p>
+        </div>
+        <div class="pipeline-step">
+          <span class="step-num">03</span>
+          <h3>Retrieve</h3>
+          <p>Hybrid semantic and metadata search — a specific date always beats a guess.</p>
+        </div>
+        <div class="pipeline-step">
+          <span class="step-num">04</span>
+          <h3>Draft</h3>
+          <p>Answer using only retrieved excerpts, citing the filing for every figure.</p>
+        </div>
+        <div class="pipeline-step">
+          <span class="step-num">05</span>
+          <h3>Verify</h3>
+          <p>A numeric check confirms every figure actually appears in the source.</p>
+        </div>
+        <div class="pipeline-step">
+          <span class="step-num">06</span>
+          <h3>Critique</h3>
+          <p>A second pass flags any claim the evidence doesn&rsquo;t clearly support.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="proof">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Proven against real filings, not a demo script</h2>
+        <p>Every metric below comes from an automated evaluation run against live NVIDIA filings.</p>
+      </div>
+      <div class="proof-grid">
+        <div class="proof-stat">
+          <span class="num">100%</span>
+          <span class="label">golden-set pass rate</span>
+        </div>
+        <div class="proof-stat">
+          <span class="num">89</span>
+          <span class="label">automated tests</span>
+        </div>
+        <div class="proof-stat">
+          <span class="num">7</span>
+          <span class="label">real, human-verified questions</span>
+        </div>
+        <div class="proof-note">
+          <strong>The pass rate didn&rsquo;t start at 100%.</strong> It went 29% → 86% → 100%, and each jump came from diagnosing one real cause — a retriever blind to filing dates, then a ranking depth limit — and writing a test that proves the fix, not from adjusting numbers until it looked right.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="try-it">
+    <div class="wrap">
+      <div class="try-banner">
+        <div>
+          <h2>See it answer real questions</h2>
+          <p>Open the assistant in the corner for real, verified answers from an evaluation run against NVIDIA&rsquo;s filings.</p>
+        </div>
+        <a href="#" class="btn btn-primary" id="open-chat-cta">Try the assistant</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Built by Zain · <a href="how-it-works.html" style="color:var(--text-muted)">architecture &amp; eval report</a></p>
+    <div class="stack-tags">
+      <span>SEC EDGAR API</span>
+      <span>Ollama</span>
+      <span>Groq</span>
+      <span>Python</span>
+      <span>Multi-agent RAG</span>
+    </div>
+  </div>
+</footer>
+
+<!-- Chat widget -->
+<button class="chat-launcher" id="chat-launcher" aria-label="Open EdgarIQ assistant" aria-expanded="false">
+  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.8 6.2L20 10l-6.2 1.8L12 18l-1.8-6.2L4 10l6.2-1.8L12 2z"/></svg>
+</button>
+
+<div class="chat-panel" id="chat-panel" role="dialog" aria-label="EdgarIQ assistant">
+  <div class="chat-header">
+    <span class="title"><span class="pulse"></span>EdgarIQ Assistant</span>
+    <button class="close-btn" id="chat-close" aria-label="Close">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M4 4l10 10M14 4L4 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div class="chat-subnote">Real answers from a recorded evaluation run against NVIDIA&rsquo;s filings — not a live model call yet.</div>
+  <div class="chat-chips" id="chat-chips"></div>
+  <div class="chat-messages" id="chat-messages"></div>
+  <div class="chat-footer">
+    <div class="chat-input-row">
+      <input type="text" placeholder="Live backend coming soon — try a question above" disabled>
+      <button aria-label="Send" disabled>
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7h11M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="conversations.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
