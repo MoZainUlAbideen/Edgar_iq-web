@@ -1,20 +1,23 @@
 # EdgarIQ — web
 ### Link : https://edgar-iq-web.vercel.app/
 The two-page marketing/explainer site for EdgarIQ, plus a chat widget that
-plays back real, verified answers from an actual evaluation run — no
-backend required for this version.
+plays back real, verified answers from an evaluation run, or talks to the live API when configured.
 
 ## Structure
 
 ```
-index.html          Home — problem, pipeline, proof
-how-it-works.html   Architecture, tech stack, real bug case studies
-styles.css           Shared design tokens + base styles
+index.html          Home — ask box, provenance specimen, problems, pipeline, proof
+how-it-works.html   Architecture, live deployment, tech stack, four bug case studies
+styles.css           Fonts (self-hosted), design tokens, nav, buttons, footer
+fonts/               Fraunces, Hanken Grotesk, IBM Plex Mono (woff2)
+og.png               Social preview image (1200x630)
+vercel.json          Long cache for fonts
 home.css             Home page only
 how.css              How-it-works page only
 chat-widget.css       Chat launcher + panel (shared, both pages)
 conversations.js      Real Q&A data the chat widget plays back
-script.js             Chat widget interactivity
+config.js             API URL (empty = curated-only)
+script.js             Chat widget (curated + live modes)
 ```
 
 Plain HTML/CSS/JS on purpose — no build step, no `node_modules`, nothing
@@ -22,8 +25,8 @@ to install. Just files a browser can open directly.
 
 ## Preview locally
 
-Just open `index.html` in a browser. No server needed for this static
-version.
+Run `python -m http.server 8000` in this folder and open http://localhost:8000
+(opening the file directly also works, but the live-backend call needs a server origin).
 
 ## Deploy to Vercel (step by step)
 
@@ -41,20 +44,16 @@ version.
 `edgariq/web/`), set Vercel's **Root Directory** setting to that subfolder
 during import, so it only deploys this site, not the Python backend.
 
-## Swapping in the real backend later
+## Live backend
 
-Right now `script.js`'s `askQuestion()` plays back a canned answer from
-`conversations.js`. To make it live:
+`config.js` holds `window.EDGARIQ_API_URL`. Leave it empty for curated-only mode (ask boxes disabled, suggestions
+play recorded answers). Set it to the Render URL of the EdgarIQ API (see `DEPLOY.md` in the main repo) and
+the widget will, on page load, call `/health`; if that succeeds the input is enabled and typed questions run
+the real pipeline (`POST /ask`, then poll `GET /ask/{id}`). If the backend is asleep or down, the widget
+says so and keeps the recorded answers working.
 
-1. Deploy the Python agent pipeline as a small API (e.g. a FastAPI wrapper
-   around `answer_question()`) to a host that supports long-running
-   requests — Render, Railway, or Fly.io all have free tiers. Vercel's own
-   serverless functions won't work for this: they time out well before a
-   ~30-50 second multi-agent pipeline run finishes, and can't run Ollama.
-2. Replace the `setTimeout(...)` block in `askQuestion()` with a real
-   `fetch()` call to that API, passing the typed question and rendering
-   the real response (answer + citations) instead of the canned one.
-3. Un-disable the text input in both HTML files once that's wired up.
+Answers are rendered through a small escape-first markdown renderer — model output is never inserted as raw
+HTML, and only `https://www.sec.gov/` source links are made clickable.
 
 ## Content honesty
 

@@ -212,3 +212,104 @@
   .chat-launcher { left: 1.1rem; bottom: 1.1rem; }
   .chat-panel { left: 0.75rem; bottom: 4.6rem; }
 }
+
+/* ============================================================
+   Live-mode additions: rendered markdown, sources, warnings,
+   enabled input. Bubbles stay transparent.
+   ============================================================ */
+
+.chat-input-row.live input { color: var(--text); }
+.chat-input-row.live button {
+  background: linear-gradient(135deg, var(--violet), var(--violet-bright));
+  color: #fff;
+  cursor: pointer;
+}
+.chat-input-row.live button:disabled { opacity: 0.45; cursor: not-allowed; }
+.chat-input-row input:focus { outline: none; }
+
+.msg-text p { margin: 0 0 0.6rem; }
+.msg-text p:last-child { margin-bottom: 0; }
+.msg-text ul { margin: 0 0 0.6rem; padding-left: 1.1rem; }
+.msg-text li { margin-bottom: 0.25rem; }
+.msg-text strong { color: var(--text); font-weight: 600; }
+.msg-text code { font-family: var(--font-mono); font-size: 0.82em; color: var(--violet-bright); }
+
+.md-table { overflow-x: auto; margin: 0 0 0.7rem; }
+.md-table table { border-collapse: collapse; font-size: 0.78rem; min-width: 100%; }
+.md-table th, .md-table td {
+  border-bottom: 1px solid var(--border);
+  padding: 0.35rem 0.5rem;
+  text-align: left;
+  vertical-align: top;
+}
+.md-table th { color: var(--text-muted); font-family: var(--font-mono); font-weight: 500; }
+
+.sources { margin-top: 0.7rem; display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; }
+.sources-label { font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-faint); }
+.sources a, .sources span:not(.sources-label) {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--violet-bright);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.15rem 0.55rem;
+  text-decoration: none;
+}
+.sources a:hover { border-color: var(--violet); }
+
+.warnings { margin-top: 0.7rem; font-size: 0.78rem; color: var(--text-muted); }
+.warnings summary { cursor: pointer; font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-faint); }
+.warnings p { margin: 0.4rem 0 0; white-space: pre-wrap; }
+
+.msg-error { color: #f0a0a0; }
+
+/* After the first message, chips collapse into one horizontally scrolling row. */
+.chat-chips.compact {
+  flex-direction: row;
+  overflow-x: auto;
+  padding: 0.6rem 1.25rem;
+  scrollbar-width: thin;
+}
+.chat-chips.compact .chat-chip { white-space: nowrap; flex: 0 0 auto; }
+
+/* ============================================================
+   Polish pass: launcher status dot, header, focus, mobile sheet
+   ============================================================ */
+
+.chat-launcher { box-shadow: inset 0 1px 0 rgba(255,255,255,.25), 0 10px 28px -6px rgba(124,58,237,.65); }
+.launcher-dot {
+  position: absolute;
+  top: 3px; right: 3px;
+  width: 13px; height: 13px;
+  border-radius: 50%;
+  background: var(--ok);
+  border: 2px solid var(--base);
+}
+.launcher-dot[hidden] { display: none; }
+.chat-launcher { position: fixed; }
+
+.chat-panel {
+  background: linear-gradient(180deg, var(--surface-raised) 0%, var(--surface) 140px);
+  box-shadow: 0 30px 80px -10px rgba(0,0,0,.7), 0 0 0 1px rgba(124,58,237,.08);
+}
+.chat-header .title { font-size: 1.08rem; font-weight: 560; letter-spacing: -0.01em; }
+.chat-header .close-btn { border-radius: 6px; padding: 0.35rem; }
+.chat-subnote { line-height: 1.45; }
+.chat-chip { line-height: 1.4; }
+.chat-chip:focus-visible, .chat-input-row:focus-within { outline: 2px solid var(--violet-bright); outline-offset: 2px; }
+.chat-input-row:focus-within { border-color: var(--violet); }
+.chat-input-row input:focus-visible { outline: none; }
+.chat-input-row input { min-width: 0; }
+
+.msg-text .cite { color: var(--text-faint); }
+.msg.assistant .msg-text { font-family: var(--font-body); }
+
+@media (max-width: 480px) {
+  .chat-panel {
+    left: 0.5rem; right: 0.5rem; bottom: 4.75rem;
+    width: auto;
+    height: min(calc(100vh - 6.5rem), 600px);
+    border-radius: 18px;
+  }
+  .chat-launcher { left: 1rem; bottom: 1rem; width: 52px; height: 52px; }
+}

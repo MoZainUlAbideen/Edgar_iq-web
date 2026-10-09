@@ -4,21 +4,27 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>How EdgarIQ works</title>
-<meta name="description" content="Architecture, tech stack, and three real bugs found and fixed while building EdgarIQ's grounded retrieval pipeline.">
-<link rel="icon" href="data:,">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<meta name="description" content="Architecture, live deployment, and four real bugs found and fixed while building EdgarIQ's grounded retrieval pipeline.">
+<meta name="theme-color" content="#0a0810">
+<meta property="og:type" content="website">
+<meta property="og:title" content="How EdgarIQ works">
+<meta property="og:description" content="Architecture, live deployment, and four real bugs found and fixed while building a grounded SEC-filing assistant.">
+<meta property="og:image" content="https://edgar-iq-web.vercel.app/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="Edgar.png">
+<link rel="preload" href="fonts/fraunces-opsz-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/hanken-grotesk-wght.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="how.css">
 <link rel="stylesheet" href="chat-widget.css">
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
 
 <header class="site-nav">
   <div class="wrap">
-    <a href="index.html" class="logo">
-      <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+    <a href="index.html" class="logo" aria-label="EdgarIQ home">
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true">
         <circle cx="13" cy="13" r="10.5" stroke="url(#g1)" stroke-width="1.6"/>
         <circle cx="18" cy="8" r="2.4" fill="#C084FC"/>
         <defs>
@@ -30,73 +36,97 @@
       </svg>
       EdgarIQ
     </a>
-    <nav class="nav-links">
+    <nav class="nav-links" aria-label="Main">
+      <span class="live-pill" id="live-pill" data-state="off"><span class="dot"></span><span id="live-pill-text">Recorded answers</span></span>
       <a href="index.html">Home</a>
-      <a href="https://github.com/MoZainUlAbideen/Edgar_iq" target="_blank" rel="noopener">View on GitHub</a>
+      <a href="#bugs" class="hide-sm">Bugs fixed</a>
+      <a class="repo-link" href="https://github.com/MoZainUlAbideen/Edgar_iq" target="_blank" rel="noopener">View on GitHub</a>
     </nav>
   </div>
 </header>
 
-<main>
+<main id="main">
 
   <section>
     <div class="wrap page-intro">
       <h1>Grounding is the whole point.</h1>
-      <p>A language model will answer a financial question whether or not it actually knows the answer. EdgarIQ is built around one constraint: every figure it states has to be traceable to a real sentence in a real filing — enforced by code, not just asked for in a prompt.</p>
+      <p>A language model will answer a financial question whether or not it actually knows the answer. EdgarIQ is built around one constraint: every figure it states has to be traceable to a real sentence in a real filing, enforced by code and not just asked for in a prompt.</p>
     </div>
   </section>
 
-  <section id="architecture">
+  <section class="band" id="architecture">
     <div class="wrap">
       <div class="section-head">
         <h2>Architecture</h2>
-        <p>Six stages, each independently tested — retrieval failures get caught before they reach an answer.</p>
+        <p>Filings are indexed once, offline. Every question then runs through four agents, and the same evaluation harness that guided development guards the result.</p>
       </div>
       <div class="diagram-wrap">
-        <svg viewBox="0 0 760 380" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="EdgarIQ architecture diagram">
+        <svg viewBox="0 0 760 380" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Architecture: EDGAR filings are parsed and chunked into a vector index. An agent orchestrator retrieves from it and produces a grounded answer, served by a FastAPI service on Render. An eval harness tests the orchestrator.">
           <defs>
             <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
               <path d="M1 1L8 5L1 9" fill="none" stroke="#C084FC" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
             </marker>
           </defs>
-
           <rect x="40" y="40" width="170" height="64" rx="10" fill="#1b1530" stroke="#2a2340"/>
-          <text x="125" y="66" text-anchor="middle" fill="#f5f3fa" font-family="Space Grotesk" font-size="14" font-weight="600">EDGAR filings</text>
-          <text x="125" y="86" text-anchor="middle" fill="#9c93b5" font-family="IBM Plex Mono" font-size="10.5">10-K / 10-Q via API</text>
-
+          <text x="125.0" y="69.0" text-anchor="middle" fill="#f5f3fa" font-family="Hanken Grotesk, sans-serif" font-size="14" font-weight="650">EDGAR filings</text>
+          <text x="125.0" y="89.0" text-anchor="middle" fill="#9c93b5" font-family="IBM Plex Mono, monospace" font-size="10.5">10-K / 10-Q via API</text>
           <rect x="250" y="40" width="170" height="64" rx="10" fill="#1b1530" stroke="#2a2340"/>
-          <text x="335" y="66" text-anchor="middle" fill="#f5f3fa" font-family="Space Grotesk" font-size="14" font-weight="600">Parse &amp; chunk</text>
-          <text x="335" y="86" text-anchor="middle" fill="#9c93b5" font-family="IBM Plex Mono" font-size="10.5">tables kept, layout dropped</text>
-
-          <rect x="460" y="40" width="170" height="64" rx="10" fill="#1b1530" stroke="#2a2340"/>
-          <text x="545" y="66" text-anchor="middle" fill="#f5f3fa" font-family="Space Grotesk" font-size="14" font-weight="600">Vector index</text>
-          <text x="545" y="86" text-anchor="middle" fill="#9c93b5" font-family="IBM Plex Mono" font-size="10.5">Ollama embeddings</text>
-
-          <line x1="210" y1="72" x2="248" y2="72" stroke="#C084FC" stroke-width="1.4" marker-end="url(#arrow)"/>
-          <line x1="420" y1="72" x2="458" y2="72" stroke="#C084FC" stroke-width="1.4" marker-end="url(#arrow)"/>
-          <path d="M545 104 L545 150 L340 150 L340 188" fill="none" stroke="#C084FC" stroke-width="1.4" marker-end="url(#arrow)"/>
-
+          <text x="335.0" y="69.0" text-anchor="middle" fill="#f5f3fa" font-family="Hanken Grotesk, sans-serif" font-size="14" font-weight="650">Parse &amp; chunk</text>
+          <text x="335.0" y="89.0" text-anchor="middle" fill="#9c93b5" font-family="IBM Plex Mono, monospace" font-size="10.5">tables kept, layout dropped</text>
+          <rect x="460" y="40" width="200" height="64" rx="10" fill="#1b1530" stroke="#2a2340"/>
+          <text x="560.0" y="69.0" text-anchor="middle" fill="#f5f3fa" font-family="Hanken Grotesk, sans-serif" font-size="14" font-weight="650">Vector index</text>
+          <text x="560.0" y="89.0" text-anchor="middle" fill="#9c93b5" font-family="IBM Plex Mono, monospace" font-size="10.5">Gemini or Ollama embeddings</text>
+          <path d="M210 72 L248 72" fill="none" stroke="#C084FC" stroke-width="1.4" marker-end="url(#arrow)"/>
+          <path d="M420 72 L458 72" fill="none" stroke="#C084FC" stroke-width="1.4" marker-end="url(#arrow)"/>
+          <path d="M560 104 L560 150 L340 150 L340 188" fill="none" stroke="#C084FC" stroke-width="1.4" marker-end="url(#arrow)"/>
           <rect x="210" y="190" width="260" height="70" rx="10" fill="#1b1530" stroke="#2a2340"/>
-          <text x="340" y="219" text-anchor="middle" fill="#f5f3fa" font-family="Space Grotesk" font-size="14" font-weight="600">Agent orchestrator</text>
-          <text x="340" y="240" text-anchor="middle" fill="#9c93b5" font-family="IBM Plex Mono" font-size="10">planner · retriever · drafter · critic</text>
-
-          <line x1="470" y1="225" x2="508" y2="225" stroke="#C084FC" stroke-width="1.4" marker-end="url(#arrow)"/>
-
+          <text x="340.0" y="222.0" text-anchor="middle" fill="#f5f3fa" font-family="Hanken Grotesk, sans-serif" font-size="14" font-weight="650">Agent orchestrator</text>
+          <text x="340.0" y="242.0" text-anchor="middle" fill="#9c93b5" font-family="IBM Plex Mono, monospace" font-size="10.5">planner · retriever · drafter · critic</text>
+          <path d="M470 225 L508 225" fill="none" stroke="#C084FC" stroke-width="1.4" marker-end="url(#arrow)"/>
           <rect x="510" y="190" width="210" height="70" rx="10" fill="#1b1530" stroke="#2a2340"/>
-          <text x="615" y="219" text-anchor="middle" fill="#f5f3fa" font-family="Space Grotesk" font-size="14" font-weight="600">Grounded answer</text>
-          <text x="615" y="240" text-anchor="middle" fill="#9c93b5" font-family="IBM Plex Mono" font-size="10">cited to source filing</text>
-
-          <line x1="340" y1="298" x2="340" y2="262" stroke="#6b6285" stroke-width="1.3" stroke-dasharray="3 4" marker-end="url(#arrow)"/>
-
+          <text x="615.0" y="222.0" text-anchor="middle" fill="#f5f3fa" font-family="Hanken Grotesk, sans-serif" font-size="14" font-weight="650">Grounded answer</text>
+          <text x="615.0" y="242.0" text-anchor="middle" fill="#9c93b5" font-family="IBM Plex Mono, monospace" font-size="10.5">cited to source filing</text>
+          <path d="M615 262 L615 298" fill="none" stroke="#C084FC" stroke-width="1.4" marker-end="url(#arrow)"/>
+          <rect x="510" y="300" width="210" height="64" rx="10" fill="#1b1530" stroke="#2a2340"/>
+          <text x="615.0" y="329.0" text-anchor="middle" fill="#f5f3fa" font-family="Hanken Grotesk, sans-serif" font-size="14" font-weight="650">FastAPI on Render</text>
+          <text x="615.0" y="349.0" text-anchor="middle" fill="#9c93b5" font-family="IBM Plex Mono, monospace" font-size="10.5">job queue · rate limits</text>
+          <path d="M340 298 L340 262" fill="none" stroke="#8b83a5" stroke-width="1.4" stroke-dasharray="3 4" marker-end="url(#arrow)"/>
           <rect x="210" y="300" width="260" height="64" rx="10" fill="#14101f" stroke="#2a2340"/>
-          <text x="340" y="326" text-anchor="middle" fill="#f5f3fa" font-family="Space Grotesk" font-size="14" font-weight="600">Eval harness</text>
-          <text x="340" y="346" text-anchor="middle" fill="#9c93b5" font-family="IBM Plex Mono" font-size="10.5">89 tests · 100% pass rate</text>
+          <text x="340.0" y="329.0" text-anchor="middle" fill="#f5f3fa" font-family="Hanken Grotesk, sans-serif" font-size="14" font-weight="650">Eval harness</text>
+          <text x="340.0" y="349.0" text-anchor="middle" fill="#9c93b5" font-family="IBM Plex Mono, monospace" font-size="10.5">120+ tests · 7 golden questions</text>
         </svg>
       </div>
     </div>
   </section>
 
-  <section id="stack">
+  <section class="band" id="live" style="padding-top:0">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Running it live, on free hosting</h2>
+        <p>The demo is a real service, not a recording. A few decisions keep it honest and affordable.</p>
+      </div>
+      <dl class="live-list">
+        <div>
+          <dt>Submit, then poll</dt>
+          <dd>A full answer takes tens of seconds, longer than a request should stay open. The page posts a question, gets a job id, and checks back until the answer is ready. One worker and a bounded queue mean a busy moment returns a clear &ldquo;try again&rdquo; instead of a hang.</dd>
+        </div>
+        <div>
+          <dt>Limits that protect the quota</dt>
+          <dd>Each visitor gets a small hourly allowance and the whole demo has a daily cap, so one curious script can&rsquo;t use up the model quota for everyone.</dd>
+        </div>
+        <div>
+          <dt>Cold starts handled in the open</dt>
+          <dd>Free hosting sleeps when idle. The page wakes it on load, shows its status in the corner, and keeps the recorded answers working in the meantime.</dd>
+        </div>
+        <div>
+          <dt>The index remembers its embedder</dt>
+          <dd>Vectors only compare with vectors from the same model. The index records which embedder built it, and the server refuses to start if the one it is configured with doesn&rsquo;t match.</dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="band" id="stack" style="padding-top:0">
     <div class="wrap">
       <div class="section-head">
         <h2>Tech stack, and why</h2>
@@ -104,11 +134,11 @@
       <div class="tech-grid">
         <div class="tech-item">
           <span class="name">SEC EDGAR REST API</span>
-          <p>Free, official, no scraping — filings come straight from the source with no intermediary to introduce errors.</p>
+          <p>Free, official, no scraping. Filings come straight from the source with no intermediary to introduce errors.</p>
         </div>
         <div class="tech-item">
-          <span class="name">Ollama · nomic-embed-text</span>
-          <p>Local embeddings, no per-query API cost, and a realistic constraint to design around — general-purpose embedding models rank narrative text differently than figure-dense text, which turned out to matter.</p>
+          <span class="name">Gemini embeddings · Ollama locally</span>
+          <p>Gemini serves the hosted demo; Ollama&rsquo;s nomic-embed-text runs the same pipeline offline. General-purpose embedding models rank narrative text differently from figure-dense text, which turned out to matter.</p>
         </div>
         <div class="tech-item">
           <span class="name">Groq · openai/gpt-oss-120b</span>
@@ -116,56 +146,73 @@
         </div>
         <div class="tech-item">
           <span class="name">Custom hybrid retrieval</span>
-          <p>Semantic search plus metadata filtering — a specific filing date always overrides a semantic guess, once one is mentioned in the question.</p>
+          <p>Semantic search plus metadata filtering. A specific filing date always overrides a semantic guess once one is mentioned in the question.</p>
+        </div>
+        <div class="tech-item">
+          <span class="name">FastAPI · Render</span>
+          <p>A small typed API with job queue, rate limits, and a CORS allowlist, deployed from a single blueprint file.</p>
+        </div>
+        <div class="tech-item">
+          <span class="name">Static site · Vercel</span>
+          <p>This page is plain HTML, CSS and JavaScript with self-hosted fonts. No framework, no build step, nothing to break.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <section id="case-studies">
+  <section class="band" id="bugs" style="padding-top:0">
     <div class="wrap">
       <div class="section-head">
-        <h2>Three real bugs, found and fixed</h2>
-        <p>Not a list of features — a record of what actually broke, how it was caught, and what fixed it.</p>
+        <h2>Four real bugs, found and fixed</h2>
+        <p>Not a list of features. A record of what actually broke, how it was caught, and what fixed it.</p>
       </div>
       <div class="case-list">
         <div class="case-item">
-          <span class="case-result">FOUND VIA<br>live filing test</span>
+          <span class="case-result">Found by a live filing test</span>
           <div>
             <h3>Currency symbols split from their values</h3>
-            <p class="case-detail"><strong>What broke:</strong> SEC table markup sometimes puts a "$" in its own cell, separate from the number. Row normalization silently truncated the real value and kept the bare symbol.</p>
+            <p class="case-detail"><strong>What broke:</strong> SEC table markup sometimes puts a &ldquo;$&rdquo; in its own cell, separate from the number. Row normalization silently truncated the real value and kept the bare symbol.</p>
             <p class="case-detail"><strong>The fix:</strong> Merge symbol-only cells into the adjacent value before column-width normalization runs, so the number survives.</p>
           </div>
         </div>
         <div class="case-item">
-          <span class="case-result">FOUND VIA<br>live pipeline run</span>
+          <span class="case-result">Found by a live pipeline run</span>
           <div>
             <h3>The critic was judging evidence it never saw</h3>
-            <p class="case-detail"><strong>What broke:</strong> The drafter's context included filing-date labels; the critic independently rebuilt its own context without them — then flagged correct citations as "unsupported," unfairly.</p>
+            <p class="case-detail"><strong>What broke:</strong> The drafter&rsquo;s context included filing-date labels; the critic independently rebuilt its own context without them, then flagged correct citations as &ldquo;unsupported.&rdquo;</p>
             <p class="case-detail"><strong>The fix:</strong> One shared context-formatting function, used by both agents, so the critic always sees exactly what the drafter saw.</p>
           </div>
         </div>
         <div class="case-item">
-          <span class="case-result">FOUND VIA<br>eval harness</span>
+          <span class="case-result">Found by the eval harness</span>
           <div>
-            <h3>Semantic search couldn't tell quarters apart</h3>
+            <h3>Semantic search couldn&rsquo;t tell quarters apart</h3>
             <p class="case-detail"><strong>What broke:</strong> Several quarters describe the same disclosure in nearly identical language. A question naming a specific filing date still retrieved the wrong one, since the date lives in metadata, not the chunk text.</p>
-            <p class="case-detail"><strong>The fix:</strong> Detect a filing date in the question and filter retrieval to that filing before ranking by similarity — hybrid retrieval, not semantics alone. Pass rate: 29% → 86% → 100%.</p>
+            <p class="case-detail"><strong>The fix:</strong> Detect a filing date in the question and filter retrieval to that filing before ranking by similarity. Pass rate went from 29% to 86% to 100%.</p>
+          </div>
+        </div>
+        <div class="case-item">
+          <span class="case-result">Found while building the hosted index</span>
+          <div>
+            <h3>The wrong embedder ran without any error</h3>
+            <p class="case-detail"><strong>What broke:</strong> A build meant for Gemini quietly used the local model because an environment variable never reached the process. The index was valid but mislabeled, and searching it with the other model would have returned plausible, wrong chunks.</p>
+            <p class="case-detail"><strong>The fix:</strong> Indexes now record which embedder built them. Scripts read it back instead of trusting configuration, the packager refuses a mismatched index, and the server won&rsquo;t start on one.</p>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <section id="eval-detail">
+  <section class="band" id="eval-detail" style="padding-top:0">
     <div class="wrap">
       <div class="section-head">
         <h2>Full eval results</h2>
-        <p>Every case in the golden set, and the actual outcome from the current run.</p>
+        <p>Every case in the golden set, and the outcome from the evaluation run.</p>
       </div>
+      <div class="table-scroll">
       <table class="eval-table">
         <thead>
-          <tr><th>Case</th><th>Type</th><th>Result</th></tr>
+          <tr><th scope="col">Case</th><th scope="col">Type</th><th scope="col">Result</th></tr>
         </thead>
         <tbody>
           <tr><td>q1_datacenter_revenue_2026q1</td><td>quantitative</td><td><span class="pass-badge"><span class="dot"></span>Pass</span></td></tr>
@@ -177,6 +224,8 @@
           <tr><td>q7_export_control_reputational_risk</td><td>qualitative</td><td><span class="pass-badge"><span class="dot"></span>Pass</span></td></tr>
         </tbody>
       </table>
+      </div>
+      <p class="eval-note">Measured with local Ollama embeddings. The hosted build uses Gemini embeddings and is re-run against the same seven cases before it goes live.</p>
     </div>
   </section>
 
@@ -184,42 +233,45 @@
 
 <footer>
   <div class="wrap">
-    <p>Built by Zain · <a href="index.html" style="color:var(--text-muted)">back to home</a></p>
+    <p>Built by Zain · <a href="index.html">back to home</a></p>
     <div class="stack-tags">
       <span>SEC EDGAR API</span>
-      <span>Ollama</span>
+      <span>Gemini embeddings</span>
       <span>Groq</span>
+      <span>FastAPI</span>
       <span>Python</span>
-      <span>Multi-agent RAG</span>
     </div>
   </div>
 </footer>
 
 <!-- Chat widget -->
-<button class="chat-launcher" id="chat-launcher" aria-label="Open EdgarIQ assistant" aria-expanded="false">
-  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.8 6.2L20 10l-6.2 1.8L12 18l-1.8-6.2L4 10l6.2-1.8L12 2z"/></svg>
+<button class="chat-launcher" id="chat-launcher" aria-label="Open EdgarIQ assistant" aria-expanded="false" aria-controls="chat-panel">
+  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l1.8 6.2L20 10l-6.2 1.8L12 18l-1.8-6.2L4 10l6.2-1.8L12 2z"/></svg>
+  <span class="launcher-dot" id="launcher-dot" hidden></span>
 </button>
 
 <div class="chat-panel" id="chat-panel" role="dialog" aria-label="EdgarIQ assistant">
   <div class="chat-header">
     <span class="title"><span class="pulse"></span>EdgarIQ Assistant</span>
-    <button class="close-btn" id="chat-close" aria-label="Close">
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M4 4l10 10M14 4L4 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    <button class="close-btn" id="chat-close" aria-label="Close assistant">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M4 4l10 10M14 4L4 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
     </button>
   </div>
-  <div class="chat-subnote">Real answers from a recorded evaluation run against NVIDIA&rsquo;s filings — not a live model call yet.</div>
+  <div class="chat-subnote" id="chat-subnote">Real answers from a recorded evaluation run against NVIDIA&rsquo;s filings.</div>
   <div class="chat-chips" id="chat-chips"></div>
-  <div class="chat-messages" id="chat-messages"></div>
+  <div class="chat-messages" id="chat-messages" role="log" aria-live="polite" aria-label="Conversation"></div>
   <div class="chat-footer">
-    <div class="chat-input-row">
-      <input type="text" placeholder="Live backend coming soon — try a question above" disabled>
-      <button aria-label="Send" disabled>
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7h11M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div class="chat-input-row" id="chat-input-row">
+      <label class="sr-only" for="chat-input">Your question</label>
+      <input type="text" id="chat-input" placeholder="Live backend not connected" maxlength="500" autocomplete="off" disabled>
+      <button id="chat-send" type="button" aria-label="Send question" disabled>
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M1 7h11M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
     </div>
   </div>
 </div>
 
+<script src="config.js"></script>
 <script src="conversations.js"></script>
 <script src="script.js"></script>
 </body>
