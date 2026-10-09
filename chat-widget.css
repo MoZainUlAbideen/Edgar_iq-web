@@ -313,3 +313,21 @@
   }
   .chat-launcher { left: 1rem; bottom: 1rem; width: 52px; height: 52px; }
 }
+
+/* Layout guard: the input row must never be pushed out of view.
+   Chips are always one horizontally scrolling row; the message area is the
+   only part that flexes and scrolls. */
+.chat-panel { height: min(540px, calc(100dvh - 8rem)); }
+.chat-header, .chat-subnote, .chat-chips, .chat-footer { flex-shrink: 0; }
+.chat-messages { min-height: 0; flex: 1 1 auto; }
+.chat-chips {
+  flex-direction: row;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.7rem 1.25rem;
+  scrollbar-width: thin;
+}
+.chat-chip { white-space: nowrap; flex: 0 0 auto; max-width: 17rem; overflow: hidden; text-overflow: ellipsis; }
+@media (max-width: 480px) {
+  .chat-panel { height: min(calc(100dvh - 6.5rem), 600px); }
+}
